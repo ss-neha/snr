@@ -14,7 +14,9 @@ plt.rcParams["mathtext.fontset"] = "dejavuserif"
 plt.rcParams["figure.facecolor"] = "white"
 from athena_data_2023_01 import AthenaBinary
 from athena_data_2023_01 import AthenaBinaries
+from athena_data_2023_01 import load_dict_from_hdf5, save_dict_to_hdf5
 import athena_kit as ak
+
 mu=0.618
 muH=1.4
 unit=ak.Units(lunit=ak.pc_cgs,munit=mu*ak.atomic_mass_unit_cgs*ak.pc_cgs**3,mu=mu)
@@ -52,5 +54,13 @@ data = dict(density = (dens_arr*unit.density_cgs, "g*cm**-3"),
 bbox = np.array([[x1min,x1max], [x2min,x2max], [x3min,x3max]])
 ds = yt.load_uniform_grid(data, dens_arr.shape, length_unit="pc", periodicity=(False,False,False),
                           bbox=bbox, nprocs=256,default_species_fields='ionized')
+#Add Xray field
 source_model = pyxsim.CIESourceModel("spex", 0.05, 11.0, 1000, 1.0, binscale="log")
 xray_fields = source_model.make_source_fields(ds, 0.5, 7.0) 
+slc = ds.slice('z',0)
+sfrb = slc.to_frb((64,'pc'), (ds.domain_dimensions[0],ds.domain_dimensions[0]))
+trial= sfrb[('gas','density')]
+slice = dict()
+for k in ['density','temperature']:
+    slice[k]=sfrb[('gas',k)]
+save_dict_to_hdf5(slice,'tmp.hdf5')
