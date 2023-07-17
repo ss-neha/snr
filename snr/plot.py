@@ -12,8 +12,8 @@ for ax, wf in zip(axes,flist):
     plt.sca(ax)
     plt.pcolormesh(pdf_load['x_edges'],pdf_load['y_edges'],pdf_load[wf].T,
                    norm=LogNorm())
-    plt.xlabel('Cylindrical Radius')
-    plt.ylabel('XRay Luminosity')
+    plt.xlabel('H Nuclei Density')
+    plt.ylabel('POK')
     plt.yscale('log')
     #plt.xlim(right=20)
     plt.colorbar(label=wf)

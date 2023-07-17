@@ -1,0 +1,13 @@
+My SLURM_ARRAY_JOB_ID is 912418.
+My SLURM_ARRAY_TASK_ID is 4
+Executing on the machine: stellar-k09n2
+my snapshots: [4, 14, 24, 34, 44, 54, 64, 74, 84]
+processing 4
+processing 14
+processing 24
+processing 34
+processing 44
+processing 54
+processing 64
+processing 74
+processing 84
