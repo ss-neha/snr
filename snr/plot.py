@@ -21,17 +21,28 @@ plt.tight_layout()
 plt.savefig(f'')
 
 fig,axes = plt.subplots(1,5,figsize=(15,5))
+#nH_edges = pdf_load['x_edges'][1]-pdf_load['x_edges'][0]
 for ax, wf in zip(axes,flist):
     plt.sca(ax)
-    dR=np.diff(cr_edges)
-    R = 0.5*(cr_edges[1:]+cr_edges[:-1])
-    A = 2*np.pi*R*dR
-    plt.step(cr_edges[:-1],pdf[wf].sum(axis=1)/A)
-    #plt.xscale('log')
+    plt.step(pdf_load['x_edges'][:-1],pdf[wf].sum(axis=1))
+    plt.xscale('log')
     plt.yscale('log')
     #plt.ylim(1.e-5,10)
-    plt.xlabel('Cylindrical Radius')
+    plt.xlabel('H Nuclei Density')
     plt.ylabel(wf)
-    plt.xlim(-1,20)
-
+    #plt.xlim(-1,20)
 plt.tight_layout()
+
+fig,axes = plt.subplots(1,5,figsize=(15,5))
+#nH_edges = pdf_load['x_edges'][1]-pdf_load['x_edges'][0]
+for ax, wf in zip(axes,flist):
+    plt.sca(ax)
+    plt.step(pdf_load['y_edges'][:-1],pdf[wf].sum(axis=0))
+    plt.xscale('log')
+    plt.yscale('log')
+    #plt.ylim(1.e-5,10)
+    plt.xlabel('POK')
+    plt.ylabel(wf)
+    #plt.xlim(-1,20)
+plt.tight_layout()
+
