@@ -3,10 +3,14 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 from athena_data_2023_01 import load_dict_from_hdf5, save_dict_to_hdf5
 
+with open(f'./pdf_nH_pok_0000.p','rb') as fp:
+    pdf_load = pickle.load(fp)
+#pdf_loaded = pdf_nH_pok_0000.p
+flist = ['vol','mass']
 fig,axes = plt.subplots(1,5,figsize=(15,5))
 for ax, wf in zip(axes,flist):
     plt.sca(ax)
-    plt.pcolormesh(cr_edges,Lx_edges,pdf[wf].T,
+    plt.pcolormesh(pdf_load['x_edges'],pdf_load['y_edges'],pdf_load[wf].T,
                    norm=LogNorm())
     plt.xlabel('Cylindrical Radius')
     plt.ylabel('XRay Luminosity')
@@ -14,6 +18,7 @@ for ax, wf in zip(axes,flist):
     #plt.xlim(right=20)
     plt.colorbar(label=wf)
 plt.tight_layout()
+plt.savefig(f'')
 
 fig,axes = plt.subplots(1,5,figsize=(15,5))
 for ax, wf in zip(axes,flist):
