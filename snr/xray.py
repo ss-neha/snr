@@ -14,7 +14,7 @@ plt.rcParams["mathtext.fontset"] = "dejavuserif"
 plt.rcParams["figure.facecolor"] = "white"
 from athena_data_2023_01 import AthenaBinary, save_dict_to_hdf5
 # from athena_data_2023_01 import AthenaBinaries
-# from athena_data_2023_01 import load_dict_from_hdf5, 
+# from athena_data_2023_01 import load_dict_from_hdf5,
 import athena_kit as ak
 
 # define heating rate temporarily
@@ -59,7 +59,7 @@ def energy_loss(field,data):
             data[("gas", "cell_volume")])
 
 # adding new fields
-def add_yt_fields(ds):    
+def add_yt_fields(ds):
     ds.add_field(
         name=("gas", "pok"),
         function=_pok,
@@ -167,18 +167,18 @@ def setup_bin_field_info(Nbin=256, xray_field=('gas', 'xray_luminosity_0.5_7.0_k
     bin_fields['y'] = dict(fieldname = ('gas','y'),
             units = 'pc',
             Nedge = Nbin+1, min=-32, max=32, log=False)
-            
- 
+
+
     # weight field only
     bin_fields['vol'] = dict(fieldname = ('gas', 'cell_volume'),
                              units = 'pc**3')
-    
+
     bin_fields['mass'] = dict(fieldname = ('gas', 'cell_mass'),
-                             units = 'Msun')    
+                             units = 'Msun')
     bin_fields['etot'] = dict(fieldname = ('gas', 'total_energy'),
-                             units = 'erg')    
+                             units = 'erg')
     bin_fields['eloss'] = dict(fieldname = ('gas', 'energy_loss_rate'),
-                             units = 'erg/s')    
+                             units = 'erg/s')
 
     # T=ds.r[('gas','temperature')]
     # vz=ds.r[('gas','velocity_z')]
@@ -216,7 +216,7 @@ def setup_bin_field_info(Nbin=256, xray_field=('gas', 'xray_luminosity_0.5_7.0_k
     # cr_edges=np.linspace(0,64,Nbin+1)
     # sr_edges=np.linspace(0,64,Nbin+1)
     # Lx_edges=np.logspace(25,35,Nbin+1)
-   
+
     return bin_fields
 
 def ytload(abin):
@@ -227,7 +227,7 @@ def ytload(abin):
 
     # read Athenabinary into yt
     # abin=atbs.abins[inum]
-    
+
     # update global variable hrate
     hrate=float(abin.header("problem","hrate"))
 
@@ -246,17 +246,17 @@ def ytload(abin):
     vely_arr=abin.get_data('vely',xyz=list(xyz*1),level=0).T
     velz_arr=abin.get_data('velz',xyz=list(xyz*1),level=0).T
     pres_arr=abin.get_data('pres',xyz=list(xyz*1),level=0).T
-    data = dict(density = (dens_arr*unit.density_cgs, "g*cm**-3"), 
-                number_density = (dens_arr, "cm**-3"), 
-                H_nuclei_density = (mu/muH*dens_arr, "cm**-3"), 
+    data = dict(density = (dens_arr*unit.density_cgs, "g*cm**-3"),
+                number_density = (dens_arr, "cm**-3"),
+                H_nuclei_density = (mu/muH*dens_arr, "cm**-3"),
                 temperature= (temp_arr*unit.temperature_cgs, "K"),
-                pressure= (pres_arr*unit.pressure_cgs, "erg*cm**-3"),            
+                pressure= (pres_arr*unit.pressure_cgs, "erg*cm**-3"),
                 velocity_x = (velx_arr*unit.velocity_cgs, "cm*s**-1"),
                 velocity_y = (vely_arr*unit.velocity_cgs, "cm*s**-1"),
                 velocity_z = (velz_arr*unit.velocity_cgs, "cm*s**-1"),
             )
     bbox = np.array([[x1min,x1max], [x2min,x2max], [x3min,x3max]])
-    ds = yt.load_uniform_grid(data, dens_arr.shape, 
+    ds = yt.load_uniform_grid(data, dens_arr.shape,
                               sim_time = abin.time,
                               length_unit="pc", periodicity=(False,False,False),
                               bbox=bbox, nprocs=256,default_species_fields='ionized')
@@ -276,7 +276,7 @@ if __name__ == "__main__":
     else:
         print('Wrong argument')
         sys.exit()
-    
+
     #check number of files
     files= sorted(glob.glob(os.path.join(path,baseid + "*")))
     fstart= int(files[0][-6:-4])
@@ -288,7 +288,9 @@ if __name__ == "__main__":
     #ilist = [0,10]
 
     # set up bin information for PDFs
-    bin_info = setup_bin_field_info(Nbin=ds.domain_dimensions[0])
+    bin_info = setup_bin_field_info(Nbin=256)
+    # will update x and y bins
+    xyupdate = False
 
     # setup source model
     source_model = pyxsim.CIESourceModel("spex", 0.05, 11.0, 1000, 1.0, binscale="log")
@@ -296,7 +298,7 @@ if __name__ == "__main__":
         abin = AthenaBinary(path=path,num=i,version='0.2')
         abin.load_binary(os.path.join(path,f"{baseid}{i:05d}.bin"))
         abin.config()
-        # atbs.read([i]) # read binaries from these specific files, check number of files 
+        # atbs.read([i]) # read binaries from these specific files, check number of files
         # atbs.config()
 
         print(f"processing {i}")
@@ -304,9 +306,25 @@ if __name__ == "__main__":
         # add extra fields
         add_yt_fields(ds)
 
+        # update xy bins once
+        if not xyupdate:
+            Nx = ds.domain_dimensions[0]
+            xmin = ds.domain_left_edge[0].to('pc').v
+            xmax = ds.domain_right_edge[0].to('pc').v
+            bin_info['x']['Nbin'] = Nx+1
+            bin_info['x']['min'] = xmin
+            bin_info['x']['max'] = xmax
+            Ny = ds.domain_dimensions[1]
+            ymin = ds.domain_left_edge[1].to('pc').v
+            ymax = ds.domain_right_edge[1].to('pc').v
+            bin_info['y']['Nbin'] = Ny+1
+            bin_info['y']['min'] = ymin
+            bin_info['y']['max'] = ymax
+
+
         # create xray field
-        xray_fields = source_model.make_source_fields(ds, 0.5, 7.0) 
-    
+        xray_fields = source_model.make_source_fields(ds, 0.5, 7.0)
+
         # saving slice info
         slc = ds.slice('z',0)
         sfrb = slc.to_frb((64,'pc'), (ds.domain_dimensions[0],ds.domain_dimensions[0]))
@@ -314,12 +332,12 @@ if __name__ == "__main__":
         for k in ['H_nuclei_density','temperature']:
             store[k]=sfrb[('gas',k)]
         save_dict_to_hdf5(store,os.path.join(outdir,f'slice_nT_{i:04d}.hdf5'))
-        
+
         # create PDFs
         xflist = ['nH','nH' ,'velz','r' ,'R' , 'x']
         yflist = ['T' ,'pok','T'   ,'Lx','Lx', 'y']
         for xf,yf in zip(xflist, yflist):
-            make_one_PDF(ds,xf,yf,bin_info, wflist=['Lx','vol','mass','etot','eloss'], 
+            make_one_PDF(ds,xf,yf,bin_info, wflist=['Lx','vol','mass','etot','eloss'],
                          inum=i,save=True,outdir=outdir)
-            
-        
+
+
