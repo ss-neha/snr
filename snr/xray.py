@@ -288,7 +288,7 @@ if __name__ == "__main__":
     #ilist = [0,10]
 
     # set up bin information for PDFs
-    bin_info = setup_bin_field_info(Nbin=256)
+    bin_info = setup_bin_field_info(Nbin=ds.domain_dimensions[0])
 
     # setup source model
     source_model = pyxsim.CIESourceModel("spex", 0.05, 11.0, 1000, 1.0, binscale="log")
