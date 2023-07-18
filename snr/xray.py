@@ -289,6 +289,8 @@ if __name__ == "__main__":
 
     # set up bin information for PDFs
     bin_info = setup_bin_field_info(Nbin=256)
+    # will update x and y bins
+    xyupdate = False
 
     # setup source model
     source_model = pyxsim.CIESourceModel("spex", 0.05, 11.0, 1000, 1.0, binscale="log")
@@ -303,6 +305,22 @@ if __name__ == "__main__":
         ds = ytload(abin)
         # add extra fields
         add_yt_fields(ds)
+
+        # update xy bins once
+        if not xyupdate:
+            Nx = ds.domain_dimensions[0]
+            xmin = ds.domain_left_edge[0].to('pc').v
+            xmax = ds.domain_right_edge[0].to('pc').v
+            bin_info['x']['Nbin'] = Nx+1
+            bin_info['x']['min'] = xmin
+            bin_info['x']['max'] = xmax
+            Ny = ds.domain_dimensions[1]
+            ymin = ds.domain_left_edge[1].to('pc').v
+            ymax = ds.domain_right_edge[1].to('pc').v
+            bin_info['y']['Nbin'] = Ny+1
+            bin_info['y']['min'] = ymin
+            bin_info['y']['max'] = ymax
+
 
         # create xray field
         xray_fields = source_model.make_source_fields(ds, 0.5, 7.0)
