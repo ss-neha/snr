@@ -283,7 +283,7 @@ if __name__ == "__main__":
     fstart= int(files[0][-6:-4])
     fend= int(files[-1][-6:-4])
     # ilist = list(range(fstart, fend + 1))
-    myilist = list(range(myid,fend,10))
+    myilist = list(range(myid,fend + 1,10))
     # print("available snapshots:",ilist)
     print("my snapshots:",myilist)
     #ilist = [0,10]
