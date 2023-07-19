@@ -147,7 +147,7 @@ def make_one_PDF(ds,xf,yf,bin_fields,
             pickle.dump(pdf,fp)
     return pdf
 
-def setup_bin_field_info(Nbin= ds.domain_dimensions[0], xray_field=('gas', 'xray_luminosity_0.5_7.0_keV')):
+def setup_bin_field_info(Nbin=256, xray_field=('gas', 'xray_luminosity_0.5_7.0_keV')):
     # bin field definitions
     bin_fields = dict()
     bin_fields['T'] = dict(fieldname = ('gas','temperature'),
@@ -322,13 +322,13 @@ if __name__ == "__main__":
             Nx = ds.domain_dimensions[0]
             xmin = ds.domain_left_edge[0].to('pc').v
             xmax = ds.domain_right_edge[0].to('pc').v
-            bin_info['x']['Nbin'] = Nx+1
+            bin_info['x']['Nedge'] = Nx+1
             bin_info['x']['min'] = xmin
             bin_info['x']['max'] = xmax
             Ny = ds.domain_dimensions[1]
             ymin = ds.domain_left_edge[1].to('pc').v
             ymax = ds.domain_right_edge[1].to('pc').v
-            bin_info['y']['Nbin'] = Ny+1
+            bin_info['y']['Nedge'] = Ny+1
             bin_info['y']['min'] = ymin
             bin_info['y']['max'] = ymax
 
