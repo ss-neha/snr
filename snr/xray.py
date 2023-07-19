@@ -130,6 +130,7 @@ def make_one_PDF(ds,xf,yf,bin_fields,
     pdf['y_edges']= yedges
     pdf['xf'] = xf
     pdf['yf'] = yf
+    pdf['time'] = ds.current_time
 
     if save:
         fnamebase = f'pdf_{xf}_{yf}_{inum:04d}.p'
