@@ -58,6 +58,11 @@ def energy_loss(field,data):
     return (data[("gas", "net_cooling_rate")] *
             data[("gas", "cell_volume")])
 
+def thermal_e(field, data):
+    return (data[("gas", "thermal_energy_density")] *
+        data[("gas", "cell_volume")])
+
+
 # adding new fields
 def add_yt_fields(ds):
     ds.add_field(
@@ -101,6 +106,10 @@ def add_yt_fields(ds):
         function=energy_loss,
         sampling_type="local",
     )
+    ds.add_field(
+    name=("gas", "thermal_energy"),
+    function=thermal_e,
+    sampling_type="local",)
 
 def get_edges(bin_info):
     bmin,bmax,N = bin_info['min'],bin_info['max'],bin_info['Nedge']
@@ -112,7 +121,7 @@ def get_edges(bin_info):
 
 # creating/saving one joint PDF
 def make_one_PDF(ds,xf,yf,bin_fields,
-                 wflist=['Lx','vol','mass','etot','eloss'],
+                 wflist=['Lx','vol','mass','etot','eloss','ether'],
                  inum=0,
                  save=False, outdir='./final_test/'):
     pdf = dict()
@@ -138,7 +147,7 @@ def make_one_PDF(ds,xf,yf,bin_fields,
             pickle.dump(pdf,fp)
     return pdf
 
-def setup_bin_field_info(Nbin=256, xray_field=('gas', 'xray_luminosity_0.5_7.0_keV')):
+def setup_bin_field_info(Nbin= ds.domain_dimensions[0], xray_field=('gas', 'xray_luminosity_0.5_7.0_keV')):
     # bin field definitions
     bin_fields = dict()
     bin_fields['T'] = dict(fieldname = ('gas','temperature'),
@@ -166,20 +175,21 @@ def setup_bin_field_info(Nbin=256, xray_field=('gas', 'xray_luminosity_0.5_7.0_k
                 units = 'pc',
                 Nedge = Nbin+1, min=-32, max=32, log=False)
     bin_fields['y'] = dict(fieldname = ('gas','y'),
-            units = 'pc',
-            Nedge = Nbin+1, min=-32, max=32, log=False)
+                units = 'pc',
+                Nedge = Nbin+1, min=-32, max=32, log=False)
 
 
     # weight field only
     bin_fields['vol'] = dict(fieldname = ('gas', 'cell_volume'),
                              units = 'pc**3')
-
     bin_fields['mass'] = dict(fieldname = ('gas', 'cell_mass'),
                              units = 'Msun')
     bin_fields['etot'] = dict(fieldname = ('gas', 'total_energy'),
                              units = 'erg')
     bin_fields['eloss'] = dict(fieldname = ('gas', 'energy_loss_rate'),
                              units = 'erg/s')
+    bin_fields['ether'] = dict(fieldname = ('gas','thermal_energy,'),
+                             units = 'erg')
 
     # T=ds.r[('gas','temperature')]
     # vz=ds.r[('gas','velocity_z')]
@@ -338,7 +348,7 @@ if __name__ == "__main__":
         xflist = ['nH','nH' ,'velz','r' ,'R' , 'x']
         yflist = ['T' ,'pok','T'   ,'Lx','Lx', 'y']
         for xf,yf in zip(xflist, yflist):
-            make_one_PDF(ds,xf,yf,bin_info, wflist=['Lx','vol','mass','etot','eloss'],
+            make_one_PDF(ds,xf,yf,bin_info, wflist=['Lx','vol','mass','etot','eloss','ether'],
                          inum=i,save=True,outdir=outdir)
 
 
