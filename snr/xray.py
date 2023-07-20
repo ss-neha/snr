@@ -7,6 +7,7 @@ import glob
 import sys
 import os
 import pickle
+from mpi4py import MPI
 sys.path.append('/home/nn0933/athenaresearch/python/') # path to athena_data and athena_kit module
 sys.path.append('/home/nn0933/athenaresearch/') # path to athena_data and athena_kit module
 plt.rcParams["font.family"] = "serif"
@@ -273,9 +274,14 @@ def ytload(abin):
                               bbox=bbox, nprocs=256,default_species_fields='ionized')
     return ds
 
+import gc 
+
 if __name__ == "__main__":
     import os
-    myid = int(os.environ["SLURM_ARRAY_TASK_ID"])
+    # myid = int(os.environ["SLURM_ARRAY_TASK_ID"])
+    COMM = MPI.COMM_WORLD
+    myid = COMM.rank
+    nrank = COMM.size
     # initialization
     basedir = '/home/mg9443/scratch/share/data/snr/snr_net/'
     outbase = '/scratch/gpfs/nn0933/'
@@ -292,8 +298,9 @@ if __name__ == "__main__":
     files= sorted(glob.glob(os.path.join(path,baseid + "*")))
     fstart= int(files[0][-6:-4])
     fend= int(files[-1][-6:-4])
-    # ilist = list(range(fstart, fend + 1))
-    myilist = list(range(myid,fend + 1,10))
+    ilist = list(range(fstart, fend + 1))
+    # myilist = list(range(myid,fend + 1,10))
+    myilist = [i for i in ilist if i%nrank == myid]
     # print("available snapshots:",ilist)
     print("my snapshots:",myilist)
     #ilist = [0,10]
@@ -301,7 +308,7 @@ if __name__ == "__main__":
     # set up bin information for PDFs
     bin_info = setup_bin_field_info(Nbin=256)
     # will update x and y bins
-    xyupdate = False
+    xyupdate = True
 
     # setup source model
     source_model = pyxsim.CIESourceModel("spex", 0.05, 11.0, 1000, 1.0, binscale="log")
@@ -318,7 +325,7 @@ if __name__ == "__main__":
         add_yt_fields(ds)
 
         # update xy bins once
-        if not xyupdate:
+        if xyupdate:
             Nx = ds.domain_dimensions[0]
             xmin = ds.domain_left_edge[0].to('pc').v
             xmax = ds.domain_right_edge[0].to('pc').v
@@ -331,7 +338,7 @@ if __name__ == "__main__":
             bin_info['y']['Nedge'] = Ny+1
             bin_info['y']['min'] = ymin
             bin_info['y']['max'] = ymax
-
+            xyupdate=False
 
         # create xray field
         xray_fields = source_model.make_source_fields(ds, 0.5, 7.0)
@@ -351,4 +358,7 @@ if __name__ == "__main__":
             make_one_PDF(ds,xf,yf,bin_info, wflist=['Lx','vol','mass','etot','eloss','ether'],
                          inum=i,save=True,outdir=outdir)
 
+        abin = None
+        ds = None
+        gc.collect()
 
