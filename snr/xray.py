@@ -188,7 +188,7 @@ def setup_bin_field_info(Nbin=256, xray_field=('gas', 'xray_luminosity_0.5_7.0_k
                              units = 'erg')
     bin_fields['eloss'] = dict(fieldname = ('gas', 'energy_loss_rate'),
                              units = 'erg/s')
-    bin_fields['ether'] = dict(fieldname = ('gas','thermal_energy,'),
+    bin_fields['ether'] = dict(fieldname = ('gas','thermal_energy'),
                              units = 'erg')
 
     # T=ds.r[('gas','temperature')]
