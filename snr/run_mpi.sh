@@ -5,7 +5,7 @@
 #SBATCH --nodes=1                # node count
 #SBATCH --ntasks=12              # total number of tasks across all nodes
 ##SBATCH --exclusive
-#SBATCH --mem=3000G
+#SBATCH --mem=2000G
 #SBATCH --partition=bigmem
 #SBATCH --cpus-per-task=1        # cpu-cores per task (>1 if multi-threaded tasks)
 #SBATCH --time=06:00:00          # total run time limit (HH:MM:SS)
