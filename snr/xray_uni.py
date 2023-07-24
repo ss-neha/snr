@@ -17,6 +17,7 @@ from athena_data_2023_01 import AthenaBinary, save_dict_to_hdf5
 # from athena_data_2023_01 import AthenaBinaries
 # from athena_data_2023_01 import load_dict_from_hdf5,
 import athena_kit as ak
+import time
 
 # define heating rate temporarily
 hrate = 2e-26
@@ -279,6 +280,7 @@ import gc
 if __name__ == "__main__":
     import os
     # myid = int(os.environ["SLURM_ARRAY_TASK_ID"])
+    time1 = time.time()
     COMM = MPI.COMM_WORLD
     myid = COMM.rank
     nrank = COMM.size
@@ -361,4 +363,9 @@ if __name__ == "__main__":
         abin = None
         ds = None
         gc.collect()
+
+    time2 = time.time()
+
+    print(f"Time cost: {time2-time1:.2f}s")
+    print("Done")
 
