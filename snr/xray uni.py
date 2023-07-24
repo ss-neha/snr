@@ -283,7 +283,7 @@ if __name__ == "__main__":
     myid = COMM.rank
     nrank = COMM.size
     # initialization
-    basedir = '/home/mg9443/scratch/share/data/snr_theory/'
+    basedir = '/home/mg9443/scratch/share/data/snr/snr_uni/'
     outbase = '/scratch/gpfs/nn0933/'
     baseid = 'Blast.hydro_w.'
     if len(sys.argv) == 2:
