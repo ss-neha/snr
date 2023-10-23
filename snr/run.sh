@@ -21,4 +21,4 @@ conda activate snr-xray
 cd snr/snr/
 
 # srun python xray.py snrnet_h05_t16_128_k0
-srun python xray.py snrnet_h05_t16_256_k0
+srun python xraynew.py snrnet_h05_t16_256_k0
