@@ -5,7 +5,7 @@
 #SBATCH --nodes=1                # node count
 #SBATCH --ntasks=1               # total number of tasks across all nodes
 #SBATCH --cpus-per-task=1        # cpu-cores per task (>1 if multi-threaded tasks)
-#SBATCH --mem-per-cpu=4G         # memory per cpu-core (4G is default)
+#SBATCH --mem-per-cpu=8G         # memory per cpu-core (4G is default)
 #SBATCH --time=06:00:00          # total run time limit (HH:MM:SS)
 #SBATCH --array=0-9              # job array with index values 0-9
 
@@ -20,5 +20,4 @@ conda activate snr-xray
 
 cd snr/snr/
 
-# srun python xray.py snrnet_h05_t16_128_k0
 srun python xraynew.py snrnet_h05_t16_256_k0
