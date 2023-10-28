@@ -144,6 +144,7 @@ def make_one_PDF(ds,xf,yf,bin_fields,
 
     if save:
         fnamebase = f'pdf_{xf}_{yf}_{inum:04d}.p'
+        print(fnamebase)
         with open(os.path.join(outdir,fnamebase),'wb') as fp:
             pickle.dump(pdf,fp)
     return pdf
@@ -344,16 +345,16 @@ if __name__ == "__main__":
         xray_fields = source_model.make_source_fields(ds, 0.5, 7.0)
 
         # saving slice info
-        slc = ds.slice('z',0)
-        sfrb = slc.to_frb((64,'pc'), (ds.domain_dimensions[0],ds.domain_dimensions[0]))
-        store= dict()
-        for k in ['H_nuclei_density','temperature']:
-            store[k]=sfrb[('gas',k)]
-        save_dict_to_hdf5(store,os.path.join(outdir,f'slice_nT_{i:04d}.hdf5'))
+        # slc = ds.slice('z',0)
+        # sfrb = slc.to_frb((64,'pc'), (ds.domain_dimensions[0],ds.domain_dimensions[0]))
+        # store= dict()
+        # for k in ['H_nuclei_density','temperature']:
+        #     store[k]=sfrb[('gas',k)]
+        # save_dict_to_hdf5(store,os.path.join(outdir,f'slice_nT_{i:04d}.hdf5'))
 
         # create PDFs
-        xflist = ['r', 'R']
-        yflist = ['nH', 'nH']
+        xflist = ['r', 'R', 'r', 'R']
+        yflist = ['nH', 'nH', 'T', 'T']
         for xf,yf in zip(xflist, yflist):
             make_one_PDF(ds,xf,yf,bin_info, wflist=['Lx','vol','mass','etot','eloss','ether'],
                          inum=i,save=True,outdir=outdir)

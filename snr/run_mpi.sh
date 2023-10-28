@@ -1,7 +1,7 @@
 #!/bin/bash
 #SBATCH --job-name=xray          # create a short name for your job
-#SBATCH --output=slurm-%A.%a.out # stdout file
-#SBATCH --error=slurm-%A.%a.err  # stderr file
+#SBATCH --output=slurm-%A.out # stdout file
+#SBATCH --error=slurm-%A.err  # stderr file
 #SBATCH --nodes=1                # node count
 #SBATCH --ntasks=12              # total number of tasks across all nodes
 ##SBATCH --exclusive
@@ -15,7 +15,7 @@ module load openmpi/gcc/4.1.0
 module load anaconda3/2021.11
 conda activate snr-xray
 
-cd snr/snr/
+cd $HOME/snr/snr/
 
 # srun python xray.py snrnet_h05_t16_128_k0
 # srun python xray.py snrnet_h05_t16_256_k0
